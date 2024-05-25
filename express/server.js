@@ -69,12 +69,9 @@ io.on("connection", (socket) => {
   });
 
   setInterval(function () {
+    socket.emit("physics", gamePhysicsData);
 
-    socket.emit("leftPlayerPos", gamePhysicsData.firstPlayerPos);
-    socket.emit("rightPlayerPos", gamePhysicsData.secondPlayerPos);
-
-    socket.emit("ballLeftPos", gamePhysicsData.ballLeftPos);
-    socket.emit("ballTopPos", gamePhysicsData.ballTopPos);
+   
   }, 10)
 
   

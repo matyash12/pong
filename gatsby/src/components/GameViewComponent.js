@@ -9,11 +9,13 @@ import ButtonComponent from "./ButtonComponent";
 
 
 function GameViewComponent() {
-    const [leftPlayerPos, setLeftPlayerPos] = React.useState('0px')
-    const [rightPlayerPos, setRightPlayerPos] = React.useState('0px')
+    const [firstPlayerPos, setFirstPlayerPos] = React.useState('0px')
+    const [secondPlayerPos, setSecondPlayerPos] = React.useState('0px')
     const [ballLeftPos, setBallLeftPos] = React.useState('0px')
     const [ballTopPos, setBallTopPos] = React.useState('0px')
     const [socket, setSocket] = React.useState(null);
+    const [startIn, setStartIn] = React.useState(null)
+    const [physics, setPhysics] = React.useState(null);
     const [gameRunning, setGameRunning] = React.useState(false);
 
     function upOnClick() {
@@ -41,20 +43,17 @@ function GameViewComponent() {
         const newSocket = io('http://localhost/');
         setSocket(newSocket);
 
-        newSocket.on("leftPlayerPos", function (position) {
-            setLeftPlayerPos(position)
+
+        newSocket.on("physics", function(physics){
+            setPhysics(physics)
+            setFirstPlayerPos(physics.firstPlayerPos)
+            setSecondPlayerPos(physics.secondPlayerPos)
+            setBallLeftPos(physics.ballLeftPos)
+            setBallTopPos(physics.ballTopPos)
         })
 
-        newSocket.on("rightPlayerPos", function (position) {
-            setRightPlayerPos(position)
-        })
-
-        newSocket.on("ballLeftPos", function (position) {
-            setBallLeftPos(position)
-        })
-
-        newSocket.on("ballTopPos", function (position) {
-            setBallTopPos(position)
+        newSocket.on("startIn", function(startIn){
+            setStartIn(startIn)
         })
 
         newSocket.on("join", function(join){
@@ -78,7 +77,7 @@ function GameViewComponent() {
             <ButtonComponent text="Join" onClick={joinOnClick}></ButtonComponent>
             ) : (
             <div>
-                <PlayFieldComponent leftPlayerPos={leftPlayerPos} rightPlayerPos={rightPlayerPos} ballLeftPos={ballLeftPos} ballTopPos={ballTopPos}></PlayFieldComponent>
+                <PlayFieldComponent leftPlayerPos={firstPlayerPos} rightPlayerPos={secondPlayerPos} ballLeftPos={ballLeftPos} ballTopPos={ballTopPos}></PlayFieldComponent>
                 <ButtonsComponent downOnClick={downOnClick} upOnClick={upOnClick}></ButtonsComponent>
             </div>
             )}
