@@ -1,48 +1,74 @@
 import { createServer } from "http";
 import { Server } from "socket.io";
+import calculatePlayerPositionComponent from "./components/calculatePlayerPositionComponent.js";
 
 const httpServer = createServer();
 const io = new Server(httpServer, {
   // options
 });
 
-const playerMovementSpeed = 100;
+var firstPlayerSocketId = null;
+var secondPlayerSocketId = null;
 
-const minPlayerBarrier = 0;
-const maxPlayerBarrier = 400;
+var firstPlayerMove = null;
+var secondPlayerMove = null;
 
-var leftPlayerMove = null;
-var leftPlayerPos = 0;
+var firstPlayerPos = 0;
+var secondPlayerPos = 0;
 
-var rightPlayerMove = null;
-var rightPlayerPos = 0;
-
-//performing physicics update every 20 miliseconds
-setInterval(function(){
-  if (leftPlayerMove == "up"){
-    leftPlayerPos -= playerMovementSpeed * 0.02;
-    if (minPlayerBarrier > leftPlayerPos){
-      leftPlayerPos = minPlayerBarrier;
-    }
-  }
-  if (leftPlayerMove == "down"){
-    leftPlayerPos += playerMovementSpeed * 0.02;
-    if (maxPlayerBarrier < leftPlayerPos){
-      leftPlayerPos = maxPlayerBarrier;
-    }
-  }
+//performing physics update every 20 miliseconds
+setInterval(function () {
+  firstPlayerPos = calculatePlayerPositionComponent(firstPlayerPos, firstPlayerMove);
+  secondPlayerPos = calculatePlayerPositionComponent(secondPlayerPos, secondPlayerMove)
 }, 20)
 
 io.on("connection", (socket) => {
-    socket.on("leftPlayerPos", function(move){
+
+  socket.on("join", function (_) {
+    if (firstPlayerSocketId == null) {
+      console.log("First player connected", socket.id)
+      firstPlayerSocketId = socket.id;
+
+      socket.emit("join", "first")
+    } else if (secondPlayerSocketId == null) {
+      console.log("Second player connected", socket.id)
+      secondPlayerSocketId = socket.id;
+
+      socket.emit("join", "second")
+    } else {
+      socket.emit("join", "full")
+    }
+  })
+
+
+  socket.on("leftPlayerPos", function (move) {
+    if (firstPlayerSocketId == socket.id) {
       console.log("new leftPlayerPos movement")
-      leftPlayerMove = move
-    });
+      firstPlayerMove = move
+    } else if (secondPlayerSocketId == socket.id) {
+      secondPlayerMove = move;
+    }
+  });
 
-    setInterval(function(){
-      socket.emit("leftPlayerPos",leftPlayerPos);
+  socket.on("disconnect", function () {
+    if (firstPlayerSocketId == socket.id) {
+      console.log("First player disconnect", socket.id)
+      firstPlayerSocketId = null;
+    } else if (secondPlayerSocketId == socket.id) {
+      console.log("Second player disconnect", socket.id)
+      secondPlayerSocketId = null;
+    }
+  });
 
-    }, 10)
+  setInterval(function () {
+    if (firstPlayerSocketId == socket.id) {
+      socket.emit("leftPlayerPos", firstPlayerPos);
+      socket.emit("rightPlayerPos", secondPlayerPos);
+    } else if (secondPlayerSocketId == socket.id) {
+      socket.emit("leftPlayerPos", secondPlayerPos);
+      socket.emit("rightPlayerPos", firstPlayerPos);
+    }
+  }, 10)
 });
 
 httpServer.listen(4000);
