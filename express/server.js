@@ -2,6 +2,7 @@ import { createServer } from "http";
 import { Server } from "socket.io";
 import calculatePlayerPositionComponent from "./components/calculatePlayerPositionComponent.mjs";
 import calculateBallPositionComponent from "./components/calculateBallPositionComponent.mjs";
+import physics from "./components/physics.mjs";
 
 const httpServer = createServer();
 const io = new Server(httpServer, {
@@ -11,29 +12,22 @@ const io = new Server(httpServer, {
 var firstPlayerSocketId = null;
 var secondPlayerSocketId = null;
 
-var firstPlayerMove = null;
-var secondPlayerMove = null;
 
-var firstPlayerPos = 0;
-var secondPlayerPos = 0;
-
-var ballLeftPos = 480;
-var ballTopPos = 230;
-
-var ballLeftMovementSpeed = 5;
-var ballTopMovementSpeed = 0;
+const gamePhysicsData = {
+  firstPlayerMove: 0,
+  secondPlayerMove: 0,
+  firstPlayerPos: 0,
+  secondPlayerPos: 0,
+  ballLeftPos: 480,
+  ballTopPos: 230,
+  ballLeftMovementSpeed: 0,
+  ballTopMovementSpeed: 0,
+}
 
 //performing physics update every 20 miliseconds
 setInterval(function () {
-  firstPlayerPos = calculatePlayerPositionComponent(firstPlayerPos, firstPlayerMove);
-  secondPlayerPos = calculatePlayerPositionComponent(secondPlayerPos, secondPlayerMove)
-
-  var ballData = calculateBallPositionComponent(ballLeftPos,ballTopPos,ballLeftMovementSpeed, ballTopMovementSpeed, firstPlayerPos, secondPlayerPos);
-
-  ballLeftPos = ballData.ballLeftPosition;
-  ballTopPos = ballData.ballTopPosition;
-  ballLeftMovementSpeed = ballData.ballLeftMovementSpeed;
-  ballTopMovementSpeed = ballData.ballTopMovementSpeed;
+  physics(gamePhysicsData);
+ 
 }, 20)
 
 io.on("connection", (socket) => {
@@ -58,9 +52,9 @@ io.on("connection", (socket) => {
   socket.on("leftPlayerPos", function (move) {
     if (firstPlayerSocketId == socket.id) {
       console.log("new leftPlayerPos movement")
-      firstPlayerMove = move
+      gamePhysicsData.firstPlayerMove = move
     } else if (secondPlayerSocketId == socket.id) {
-      secondPlayerMove = move;
+      gamePhysicsData.secondPlayerMove = move;
     }
   });
 
@@ -75,11 +69,12 @@ io.on("connection", (socket) => {
   });
 
   setInterval(function () {
-    socket.emit("leftPlayerPos", firstPlayerPos);
-    socket.emit("rightPlayerPos", secondPlayerPos);
 
-    socket.emit("ballLeftPos", ballLeftPos);
-    socket.emit("ballTopPos", ballTopPos);
+    socket.emit("leftPlayerPos", gamePhysicsData.firstPlayerPos);
+    socket.emit("rightPlayerPos", gamePhysicsData.secondPlayerPos);
+
+    socket.emit("ballLeftPos", gamePhysicsData.ballLeftPos);
+    socket.emit("ballTopPos", gamePhysicsData.ballTopPos);
   }, 10)
 
   
