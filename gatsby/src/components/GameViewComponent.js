@@ -11,6 +11,8 @@ import ButtonComponent from "./ButtonComponent";
 function GameViewComponent() {
     const [leftPlayerPos, setLeftPlayerPos] = React.useState('0px')
     const [rightPlayerPos, setRightPlayerPos] = React.useState('0px')
+    const [ballLeftPos, setBallLeftPos] = React.useState('0px')
+    const [ballTopPos, setBallTopPos] = React.useState('0px')
     const [socket, setSocket] = React.useState(null);
     const [gameRunning, setGameRunning] = React.useState(false);
 
@@ -46,6 +48,15 @@ function GameViewComponent() {
         newSocket.on("rightPlayerPos", function (position) {
             setRightPlayerPos(position)
         })
+
+        newSocket.on("ballLeftPos", function (position) {
+            setBallLeftPos(position)
+        })
+
+        newSocket.on("ballTopPos", function (position) {
+            setBallTopPos(position)
+        })
+
         newSocket.on("join", function(join){
             if (join != "full"){
                 setGameRunning(true);
@@ -67,7 +78,7 @@ function GameViewComponent() {
             <ButtonComponent text="Join" onClick={joinOnClick}></ButtonComponent>
             ) : (
             <div>
-                <PlayFieldComponent leftPlayerPos={leftPlayerPos} rightPlayerPos={rightPlayerPos}></PlayFieldComponent>
+                <PlayFieldComponent leftPlayerPos={leftPlayerPos} rightPlayerPos={rightPlayerPos} ballLeftPos={ballLeftPos} ballTopPos={ballTopPos}></PlayFieldComponent>
                 <ButtonsComponent downOnClick={downOnClick} upOnClick={upOnClick}></ButtonsComponent>
             </div>
             )}

@@ -1,6 +1,7 @@
 import { createServer } from "http";
 import { Server } from "socket.io";
-import calculatePlayerPositionComponent from "./components/calculatePlayerPositionComponent.js";
+import calculatePlayerPositionComponent from "./components/calculatePlayerPositionComponent.mjs";
+import calculateBallPositionComponent from "./components/calculateBallPositionComponent.mjs";
 
 const httpServer = createServer();
 const io = new Server(httpServer, {
@@ -16,10 +17,23 @@ var secondPlayerMove = null;
 var firstPlayerPos = 0;
 var secondPlayerPos = 0;
 
+var ballLeftPos = 480;
+var ballTopPos = 230;
+
+var ballLeftMovementSpeed = 5;
+var ballTopMovementSpeed = 0;
+
 //performing physics update every 20 miliseconds
 setInterval(function () {
   firstPlayerPos = calculatePlayerPositionComponent(firstPlayerPos, firstPlayerMove);
   secondPlayerPos = calculatePlayerPositionComponent(secondPlayerPos, secondPlayerMove)
+
+  var ballData = calculateBallPositionComponent(ballLeftPos,ballTopPos,ballLeftMovementSpeed, ballTopMovementSpeed, firstPlayerPos, secondPlayerPos);
+
+  ballLeftPos = ballData.ballLeftPosition;
+  ballTopPos = ballData.ballTopPosition;
+  ballLeftMovementSpeed = ballData.ballLeftMovementSpeed;
+  ballTopMovementSpeed = ballData.ballTopMovementSpeed;
 }, 20)
 
 io.on("connection", (socket) => {
@@ -61,14 +75,15 @@ io.on("connection", (socket) => {
   });
 
   setInterval(function () {
-    if (firstPlayerSocketId == socket.id) {
-      socket.emit("leftPlayerPos", firstPlayerPos);
-      socket.emit("rightPlayerPos", secondPlayerPos);
-    } else if (secondPlayerSocketId == socket.id) {
-      socket.emit("leftPlayerPos", secondPlayerPos);
-      socket.emit("rightPlayerPos", firstPlayerPos);
-    }
+    socket.emit("leftPlayerPos", firstPlayerPos);
+    socket.emit("rightPlayerPos", secondPlayerPos);
+
+    socket.emit("ballLeftPos", ballLeftPos);
+    socket.emit("ballTopPos", ballTopPos);
   }, 10)
+
+  
+  
 });
 
 httpServer.listen(4000);
