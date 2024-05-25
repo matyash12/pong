@@ -32,10 +32,10 @@ function GameViewComponent() {
         }
 
     }
-    function joinOnClick(){
-        if (socket){
+    function joinOnClick() {
+        if (socket) {
             console.log("Join")
-            socket.emit("join",true);
+            socket.emit("join", true);
         }
     }
 
@@ -44,7 +44,7 @@ function GameViewComponent() {
         setSocket(newSocket);
 
 
-        newSocket.on("physics", function(physics){
+        newSocket.on("physics", function (physics) {
             setPhysics(physics)
             setFirstPlayerPos(physics.firstPlayerPos)
             setSecondPlayerPos(physics.secondPlayerPos)
@@ -52,14 +52,14 @@ function GameViewComponent() {
             setBallTopPos(physics.ballTopPos)
         })
 
-        newSocket.on("startIn", function(startIn){
+        newSocket.on("startIn", function (startIn) {
             setStartIn(startIn)
         })
 
-        newSocket.on("join", function(join){
-            if (join != "full"){
+        newSocket.on("join", function (join) {
+            if (join != "full") {
                 setGameRunning(true);
-            }else{
+            } else {
                 console.log("Game full!")
                 alert("Game full :(")
             }
@@ -74,12 +74,12 @@ function GameViewComponent() {
     return (
         <div style={{ display: "flex" }}>
             {gameRunning == false ? (
-            <ButtonComponent text="Join" onClick={joinOnClick}></ButtonComponent>
+                <ButtonComponent text="Join" onClick={joinOnClick}></ButtonComponent>
             ) : (
-            <div>
-                <PlayFieldComponent leftPlayerPos={firstPlayerPos} rightPlayerPos={secondPlayerPos} ballLeftPos={ballLeftPos} ballTopPos={ballTopPos}></PlayFieldComponent>
-                <ButtonsComponent downOnClick={downOnClick} upOnClick={upOnClick}></ButtonsComponent>
-            </div>
+                <div>
+                    <PlayFieldComponent leftPlayerPos={firstPlayerPos} rightPlayerPos={secondPlayerPos} ballLeftPos={ballLeftPos} ballTopPos={ballTopPos}></PlayFieldComponent>
+                    <ButtonsComponent downOnClick={downOnClick} upOnClick={upOnClick}></ButtonsComponent>
+                </div>
             )}
         </div>
     )

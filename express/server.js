@@ -27,7 +27,7 @@ const gamePhysicsData = {
 //performing physics update every 20 miliseconds
 setInterval(function () {
   physics(gamePhysicsData);
- 
+
 }, 20)
 
 io.on("connection", (socket) => {
@@ -70,12 +70,10 @@ io.on("connection", (socket) => {
 
   setInterval(function () {
     socket.emit("physics", gamePhysicsData);
-
-   
   }, 10)
 
-  
-  
+
+
 });
 
 httpServer.listen(4000);
