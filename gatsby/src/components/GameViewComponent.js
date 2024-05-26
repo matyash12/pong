@@ -37,7 +37,7 @@ function GameViewComponent() {
 
 
     React.useEffect(() => {
-        const newSocket = io('http://localhost/');
+        const newSocket = io(process.env.GATSBY_API_URL);
 
         setSocket(newSocket);
         newSocket.emit("join", true);

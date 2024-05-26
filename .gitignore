@@ -1,1 +1,3 @@
 node_modules/
+gatsby/.env.development
+gatsby/.env.production
