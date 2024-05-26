@@ -1,13 +1,13 @@
 import calculateBallPositionComponent from "./calculateBallPositionComponent.mjs";
 import calculatePlayerPositionComponent from "./calculatePlayerPositionComponent.mjs";
 
-function physics(physicsData, onBallRightSideHit, onBallLeftSideHit) {
+function physics(physicsData, onBallRightSideHit, onBallLeftSideHit, onCollision) {
     physicsData.firstPlayerPos = calculatePlayerPositionComponent(physicsData.firstPlayerPos, physicsData.firstPlayerMove);
     physicsData.secondPlayerPos = calculatePlayerPositionComponent(physicsData.secondPlayerPos, physicsData.secondPlayerMove)
 
     var ballData = calculateBallPositionComponent(physicsData.ballLeftPos, physicsData.ballTopPos, physicsData.ballLeftMovementSpeed,
          physicsData.ballTopMovementSpeed, physicsData.firstPlayerPos, physicsData.secondPlayerPos,
-        onBallLeftSideHit, onBallRightSideHit
+        onBallLeftSideHit, onBallRightSideHit, onCollision
         );
 
     physicsData.ballLeftPos = ballData.ballLeftPosition;

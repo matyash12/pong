@@ -10,7 +10,7 @@ const playerLeftSize = 50;
 const ballTopMovementMaxSpeed = 5;
 
 function calculateBallPositionComponent(ballLeftPosition, ballTopPosition, ballLeftMovementSpeed,
-    ballTopMovementSpeed, firstPlayerPos, secondPlayerPos, onBallLeftSideHit, onBallRightSideHit) {
+    ballTopMovementSpeed, firstPlayerPos, secondPlayerPos, onBallLeftSideHit, onBallRightSideHit, onCollision) {
 
     ballLeftPosition = ballLeftPosition + ballLeftMovementSpeed;
 
@@ -30,11 +30,15 @@ function calculateBallPositionComponent(ballLeftPosition, ballTopPosition, ballL
         ballTopMovementSpeed = 0;
         onBallLeftSideHit();
     }
+    //ball hit top side
     if (ballTopMidPosition > 500 - ballTopSize / 2 && ballTopMovementSpeed > 0) {
         ballTopMovementSpeed = -ballTopMovementSpeed;
+        onCollision();
     }
+    //ball hit bottom side
     if (ballTopMidPosition < 0 + ballTopSize / 2 && ballTopMovementSpeed < 0) {
         ballTopMovementSpeed = -ballTopMovementSpeed;
+        onCollision();
     }
 
 
@@ -44,6 +48,7 @@ function calculateBallPositionComponent(ballLeftPosition, ballTopPosition, ballL
         //player is "playing" the ball
         ballTopMovementSpeed = calculateBallHitPlayerComponent(firstPlayerPos, ballTopMidPosition, playerTopSize, ballTopMovementMaxSpeed)
         ballLeftMovementSpeed = 5;
+        onCollision();
     }
 
     //right side player
@@ -52,7 +57,8 @@ function calculateBallPositionComponent(ballLeftPosition, ballTopPosition, ballL
         //player is "playing" the ball
         //ballTopMovementMaxSpeed is reversed because the player is playing on the other side
         ballTopMovementSpeed = calculateBallHitPlayerComponent(secondPlayerPos, ballTopMidPosition, playerTopSize, ballTopMovementMaxSpeed)
-        ballLeftMovementSpeed = -5
+        ballLeftMovementSpeed = -5;
+        onCollision();
     }
 
     return {

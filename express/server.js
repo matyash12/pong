@@ -10,6 +10,7 @@ const io = new Server(httpServer, {
 
 var firstPlayerSocketId = null;
 var secondPlayerSocketId = null;
+var socket = null;
 
 const gamePhysicsData = {
   firstPlayerMove: 0,
@@ -20,6 +21,7 @@ const gamePhysicsData = {
   ballTopPos: 240,
   ballLeftMovementSpeed: 0,
   ballTopMovementSpeed: 0,
+  collision: false,
 }
 
 const gameOtherData = {
@@ -55,17 +57,21 @@ function restartGame() {
 //performing update every 20 miliseconds
 setInterval(function () {
 
-
+  gamePhysicsData.collision = false;
   physics(gamePhysicsData,
     function onBallRightSideHit() {
       console.info("onBallRightSideHit");
       gameOtherData.firstPlayerScore += 1;
       restartGame();
     },
-     function onBallLeftSideHit() {
+    function onBallLeftSideHit() {
       console.info("onBallLeftSideHit");
       gameOtherData.secondPlayerScore += 1;
       restartGame();
+    },
+    function onCollision() {
+      console.info("onCollision");
+      gamePhysicsData.collision = true;
     });
 
   //if game isnt suppose to run
@@ -103,7 +109,7 @@ io.on("connection", (socket) => {
     if (firstPlayerSocketId == null) {
       console.log("First player connected", socket.id)
       firstPlayerSocketId = socket.id;
-      gameOtherData.firstPlayerName =  socket.id;
+      gameOtherData.firstPlayerName = socket.id;
       socket.emit("join", "first")
     } else if (secondPlayerSocketId == null) {
       console.log("Second player connected", socket.id)
