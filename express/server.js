@@ -134,14 +134,23 @@ io.on("connection", (socket) => {
   });
 
   socket.on("disconnect", function () {
+    function resetScore(){
+      gameOtherData.firstPlayerScore = 0;
+      gameOtherData.secondPlayerScore = 0;
+    }
+
     if (firstPlayerSocketId == socket.id) {
       console.log("First player disconnect", socket.id)
       gameOtherData.firstPlayerName = null;
       firstPlayerSocketId = null;
+      resetScore()
+      restartGame();
     } else if (secondPlayerSocketId == socket.id) {
       console.log("Second player disconnect", socket.id)
       gameOtherData.secondPlayerName = null;
       secondPlayerSocketId = null;
+      resetScore()
+      restartGame();
     }
   });
 
