@@ -113,7 +113,7 @@ function GameViewComponent() {
                 setAmILeftPlayer(join == "first")
             } else {
                 console.log("Game full!")
-                alert("Game full :(")
+                //alert("Game full :(")
             }
         });
 
@@ -132,7 +132,7 @@ function GameViewComponent() {
         <div>
             <div style={{ display: "flex" }}>
                 {gameRunning == false ? (
-                    <ButtonComponent text="Join" onClick={joinOnClick}></ButtonComponent>
+                    <h1>The game is full... please wait</h1>
                 ) : (
                     <div>
                         <PlayFieldComponent startIn={startIn} leftPlayerPos={firstPlayerPos} rightPlayerPos={secondPlayerPos} ballLeftPos={ballLeftPos} ballTopPos={ballTopPos} leftScore={firstPlayerScore} rightScore={secondPlayerScore} haveOpponent={haveOpponent}></PlayFieldComponent>
