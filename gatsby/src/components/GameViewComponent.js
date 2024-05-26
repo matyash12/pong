@@ -24,22 +24,7 @@ function GameViewComponent() {
     const [secondPlayerScore, setSecondPlayerScore] = React.useState(0);
     const [amILeftPlayer, setAmILeftPlayer] = React.useState(null);
     const [haveOpponent, setHaveOpponent] = React.useState(false);
-    
 
-    function upOnClick() {
-        if (socket) {
-            console.log("Up")
-            socket.emit("playerPos", "up")
-        }
-        console.log(haveOpponent)
-    }
-    function downOnClick() {
-        if (socket) {
-            console.log("Down")
-            socket.emit("playerPos", "down")
-        }
-
-    }
     function joinOnClick() {
         if (socket) {
             console.log("Join")
@@ -47,45 +32,68 @@ function GameViewComponent() {
         }
     }
 
+
+
     React.useEffect(() => {
         const newSocket = io('http://localhost/');
         setSocket(newSocket);
 
 
-        newSocket.on("data", function (data) {
-            console.debug("socket.on(data)")
-            setPhysics(data.gamePhysicsData)
-
-            setFirstPlayerPos(data.gamePhysicsData.firstPlayerPos)
-            setSecondPlayerPos(data.gamePhysicsData.secondPlayerPos)
-            setBallLeftPos(data.gamePhysicsData.ballLeftPos)
-            setBallTopPos(data.gamePhysicsData.ballTopPos)
-
-            setStartIn(data.gameOtherData.startIn)
-            setFirstPlayerScore(data.gameOtherData.firstPlayerScore)
-            setSecondPlayerScore(data.gameOtherData.secondPlayerScore)
-            //setHaveOpponent(true);
-
-            setHaveOpponent(data.gameOtherData.firstPlayerName != null && data.gameOtherData.secondPlayerName!= null)
-        })
-
-        newSocket.on("join", function (join) {
-            if (join != "full") {
-                setGameRunning(true);
-                setAmILeftPlayer(join == "first")
-            } else {
-                console.log("Game full!")
-                alert("Game full :(")
+        function keyHandler(e) {  // simple but powerful
+            switch (e.key) {
+                case "ArrowDown":
+                    console.debug("ArrowDown");
+                    newSocket.emit("playerPos", "down")
+                    break;
+                case "ArrowUp":
+                    console.debug("ArrowUp");
+                    newSocket.emit("playerPos", "up")
+                    break;
+                default:
+                    return;
             }
-        });
+        }
+
+        document.addEventListener("keydown", keyHandler);
+       
 
 
-        return () => {
-            if (socket) {
-                socket.disconnect();
-            }
-        };
-    }, []);
+            newSocket.on("data", function (data) {
+                setPhysics(data.gamePhysicsData)
+
+                setFirstPlayerPos(data.gamePhysicsData.firstPlayerPos)
+                setSecondPlayerPos(data.gamePhysicsData.secondPlayerPos)
+                setBallLeftPos(data.gamePhysicsData.ballLeftPos)
+                setBallTopPos(data.gamePhysicsData.ballTopPos)
+
+                setStartIn(data.gameOtherData.startIn)
+                setFirstPlayerScore(data.gameOtherData.firstPlayerScore)
+                setSecondPlayerScore(data.gameOtherData.secondPlayerScore)
+                //setHaveOpponent(true);
+
+                setHaveOpponent(data.gameOtherData.firstPlayerName != null && data.gameOtherData.secondPlayerName != null)
+            })
+
+            newSocket.on("join", function (join) {
+                if (join != "full") {
+                    setGameRunning(true);
+                    setAmILeftPlayer(join == "first")
+                } else {
+                    console.log("Game full!")
+                    alert("Game full :(")
+                }
+            });
+
+
+
+            return () => {
+                if (socket) {
+                    socket.disconnect();
+                }
+            };
+
+
+        }, []);
 
     return (
         <div>
@@ -95,7 +103,7 @@ function GameViewComponent() {
                 ) : (
                     <div>
                         <PlayFieldComponent startIn={startIn} leftPlayerPos={firstPlayerPos} rightPlayerPos={secondPlayerPos} ballLeftPos={ballLeftPos} ballTopPos={ballTopPos} leftScore={firstPlayerScore} rightScore={secondPlayerScore} haveOpponent={haveOpponent}></PlayFieldComponent>
-                        <ButtonsComponent downOnClick={downOnClick} upOnClick={upOnClick}></ButtonsComponent>
+                        
                     </div>
                 )}
             </div>

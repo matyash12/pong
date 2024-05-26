@@ -3,8 +3,6 @@ import { Server } from "socket.io";
 import calculatePlayerPositionComponent from "./components/calculatePlayerPositionComponent.mjs";
 import calculateBallPositionComponent from "./components/calculateBallPositionComponent.mjs";
 import physics from "./components/physics.mjs";
-
-
 const httpServer = createServer();
 const io = new Server(httpServer, {
   // options
@@ -30,6 +28,8 @@ const gameOtherData = {
   firstPlayerScore: 0,
   secondPlayerScore: 0,
   startIn: 5000,
+  firstPlayerLastMoveCommand: null,
+  secondPlayerLastMoveCommand: null,
 }
 
 const data = {
@@ -54,6 +54,21 @@ function restartGame() {
 
 //performing update every 20 miliseconds
 setInterval(function () {
+  //stoppig movement after 100 miliseconds
+  const nullMovementAfter = 100;
+  if (gameOtherData.firstPlayerLastMoveCommand != null){
+    if (gameOtherData.firstPlayerLastMoveCommand + nullMovementAfter < new Date().getTime()) {
+      gamePhysicsData.firstPlayerMove = "none";
+    }
+  }
+  if (gameOtherData.secondPlayerLastMoveCommand != null){
+    if (gameOtherData.secondPlayerLastMoveCommand + nullMovementAfter < new Date().getTime()) {
+      gamePhysicsData.secondPlayerMove = "none";
+    }
+  }
+
+
+
   physics(gamePhysicsData,
     function onBallRightSideHit() {
       console.info("onBallRightSideHit");
@@ -118,8 +133,10 @@ io.on("connection", (socket) => {
   socket.on("playerPos", function (move) {
     if (firstPlayerSocketId == socket.id) {
       gamePhysicsData.firstPlayerMove = move
+      gameOtherData.firstPlayerLastMoveCommand = new Date().getTime();
     } else if (secondPlayerSocketId == socket.id) {
       gamePhysicsData.secondPlayerMove = move;
+      gameOtherData.secondPlayerLastMoveCommand = new Date().getTime();
     }
   });
 
