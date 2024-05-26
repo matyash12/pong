@@ -3,6 +3,9 @@ import { Server } from "socket.io";
 import calculatePlayerPositionComponent from "./components/calculatePlayerPositionComponent.mjs";
 import calculateBallPositionComponent from "./components/calculateBallPositionComponent.mjs";
 import physics from "./components/physics.mjs";
+import 'dotenv/config'
+
+
 const httpServer = createServer();
 const io = new Server(httpServer, {
   // options
@@ -162,5 +165,4 @@ io.on("connection", (socket) => {
 
 
 });
-
-httpServer.listen(4000);
+httpServer.listen(process.env.EXPRESS_PORT);
