@@ -8,7 +8,6 @@ const IndexPage = () => {
 
   return (
     <div>
-      <h1>Hello world!</h1>
       <GameViewComponent></GameViewComponent>
     </div>
   )
