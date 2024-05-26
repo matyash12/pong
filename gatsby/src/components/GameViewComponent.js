@@ -40,7 +40,7 @@ function GameViewComponent() {
         const newSocket = io('http://localhost/');
 
         setSocket(newSocket);
-
+        newSocket.emit("join", true);
         var movement = "none";
         function newMovement(move) {
 
