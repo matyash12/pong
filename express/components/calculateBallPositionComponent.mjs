@@ -1,28 +1,34 @@
 import calculateBallHitPlayerComponent from "./calculateBallHitPlayerComponent.mjs";
 import calculatePlayerCollisionComponent from "./calculatePlayerCollisionComponent.mjs";
 
-const ballLeftSize = 25;
-const ballTopSize = 25;
+const ballLeftSize = 20;
+const ballTopSize = 20;
 
 const playerTopSize = 100;
 const playerLeftSize = 50;
 
 const ballTopMovementMaxSpeed = 5;
 
-function calculateBallPositionComponent(ballLeftPosition, ballTopPosition, ballLeftMovementSpeed, ballTopMovementSpeed, firstPlayerPos, secondPlayerPos) {
+function calculateBallPositionComponent(ballLeftPosition, ballTopPosition, ballLeftMovementSpeed,
+    ballTopMovementSpeed, firstPlayerPos, secondPlayerPos, onBallLeftSideHit, onBallRightSideHit) {
 
     ballLeftPosition = ballLeftPosition + ballLeftMovementSpeed;
 
     const ballLeftMidPosition = ballLeftPosition + ballLeftSize / 2;
     const ballTopMidPosition = ballTopPosition + ballTopSize / 2;
 
+    //ball hit right side
     if (ballLeftMidPosition > 1000 - ballLeftSize / 2) {
         ballLeftMovementSpeed = -5;
         ballTopMovementSpeed = 0;
+        onBallRightSideHit();
     }
+
+    //ball hit left side
     if (ballLeftMidPosition < 0 + ballLeftSize / 2) {
         ballLeftMovementSpeed = 5;
         ballTopMovementSpeed = 0;
+        onBallLeftSideHit();
     }
     if (ballTopMidPosition > 500 - ballTopSize / 2 && ballTopMovementSpeed > 0) {
         ballTopMovementSpeed = -ballTopMovementSpeed;

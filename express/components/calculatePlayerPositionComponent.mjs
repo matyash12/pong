@@ -1,5 +1,5 @@
 
-const playerMovementSpeed = 2;
+const playerMovementSpeed = 8;
 
 
 const minPlayerBarrier = 0;

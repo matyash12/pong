@@ -10,21 +10,28 @@ import StartInComponent from "./StartInComponent";
 
 
 function GameViewComponent() {
+    const [physics, setPhysics] = React.useState(null);
     const [firstPlayerPos, setFirstPlayerPos] = React.useState('0px')
     const [secondPlayerPos, setSecondPlayerPos] = React.useState('0px')
     const [ballLeftPos, setBallLeftPos] = React.useState('0px')
     const [ballTopPos, setBallTopPos] = React.useState('0px')
+
     const [socket, setSocket] = React.useState(null);
+
     const [startIn, setStartIn] = React.useState(null)
-    const [physics, setPhysics] = React.useState(null);
     const [gameRunning, setGameRunning] = React.useState(false);
+    const [firstPlayerScore, setFirstPlayerScore] = React.useState(0);
+    const [secondPlayerScore, setSecondPlayerScore] = React.useState(0);
+    const [amILeftPlayer, setAmILeftPlayer] = React.useState(null);
+    const [haveOpponent, setHaveOpponent] = React.useState(false);
+    
 
     function upOnClick() {
         if (socket) {
             console.log("Up")
             socket.emit("playerPos", "up")
         }
-
+        console.log(haveOpponent)
     }
     function downOnClick() {
         if (socket) {
@@ -45,21 +52,27 @@ function GameViewComponent() {
         setSocket(newSocket);
 
 
-        newSocket.on("physics", function (physics) {
-            setPhysics(physics)
-            setFirstPlayerPos(physics.firstPlayerPos)
-            setSecondPlayerPos(physics.secondPlayerPos)
-            setBallLeftPos(physics.ballLeftPos)
-            setBallTopPos(physics.ballTopPos)
-        })
+        newSocket.on("data", function (data) {
+            console.debug("socket.on(data)")
+            setPhysics(data.gamePhysicsData)
 
-        newSocket.on("startIn", function (_startIn) {
-            setStartIn(_startIn)
+            setFirstPlayerPos(data.gamePhysicsData.firstPlayerPos)
+            setSecondPlayerPos(data.gamePhysicsData.secondPlayerPos)
+            setBallLeftPos(data.gamePhysicsData.ballLeftPos)
+            setBallTopPos(data.gamePhysicsData.ballTopPos)
+
+            setStartIn(data.gameOtherData.startIn)
+            setFirstPlayerScore(data.gameOtherData.firstPlayerScore)
+            setSecondPlayerScore(data.gameOtherData.secondPlayerScore)
+            //setHaveOpponent(true);
+
+            setHaveOpponent(data.gameOtherData.firstPlayerName != null && data.gameOtherData.secondPlayerName!= null)
         })
 
         newSocket.on("join", function (join) {
             if (join != "full") {
                 setGameRunning(true);
+                setAmILeftPlayer(join == "first")
             } else {
                 console.log("Game full!")
                 alert("Game full :(")
@@ -68,7 +81,9 @@ function GameViewComponent() {
 
 
         return () => {
-            socket.disconnect();
+            if (socket) {
+                socket.disconnect();
+            }
         };
     }, []);
 
@@ -79,7 +94,7 @@ function GameViewComponent() {
                     <ButtonComponent text="Join" onClick={joinOnClick}></ButtonComponent>
                 ) : (
                     <div>
-                        <PlayFieldComponent startIn={startIn} leftPlayerPos={firstPlayerPos} rightPlayerPos={secondPlayerPos} ballLeftPos={ballLeftPos} ballTopPos={ballTopPos}></PlayFieldComponent>
+                        <PlayFieldComponent startIn={startIn} leftPlayerPos={firstPlayerPos} rightPlayerPos={secondPlayerPos} ballLeftPos={ballLeftPos} ballTopPos={ballTopPos} leftScore={firstPlayerScore} rightScore={secondPlayerScore} haveOpponent={haveOpponent}></PlayFieldComponent>
                         <ButtonsComponent downOnClick={downOnClick} upOnClick={upOnClick}></ButtonsComponent>
                     </div>
                 )}
