@@ -12,6 +12,7 @@ const io = new Server(httpServer, {
 var firstPlayerSocketId = null;
 var secondPlayerSocketId = null;
 
+var startIn = 10000; //in ms
 
 const gamePhysicsData = {
   firstPlayerMove: 0,
@@ -24,14 +25,22 @@ const gamePhysicsData = {
   ballTopMovementSpeed: 0,
 }
 
-//performing physics update every 20 miliseconds
+//performing update every 20 miliseconds
 setInterval(function () {
   physics(gamePhysicsData);
+  if (firstPlayerSocketId != null && secondPlayerSocketId != null) {
 
+    //start countdown when both players are connected
+    startIn -= 20;
+    if (startIn < 0) {
+      startIn = 0;
+    }
+  }
 }, 20)
 
 io.on("connection", (socket) => {
 
+  //called when player press "join"
   socket.on("join", function (_) {
     if (firstPlayerSocketId == null) {
       console.log("First player connected", socket.id)
@@ -44,14 +53,14 @@ io.on("connection", (socket) => {
 
       socket.emit("join", "second")
     } else {
+
       socket.emit("join", "full")
     }
   })
 
-
-  socket.on("leftPlayerPos", function (move) {
+  //client is sending his desired move
+  socket.on("playerPos", function (move) {
     if (firstPlayerSocketId == socket.id) {
-      console.log("new leftPlayerPos movement")
       gamePhysicsData.firstPlayerMove = move
     } else if (secondPlayerSocketId == socket.id) {
       gamePhysicsData.secondPlayerMove = move;
@@ -70,6 +79,7 @@ io.on("connection", (socket) => {
 
   setInterval(function () {
     socket.emit("physics", gamePhysicsData);
+    socket.emit("startIn", startIn);
   }, 10)
 
 
