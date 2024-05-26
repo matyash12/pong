@@ -54,19 +54,6 @@ function restartGame() {
 
 //performing update every 20 miliseconds
 setInterval(function () {
-  //stoppig movement after 100 miliseconds
-  const nullMovementAfter = 100;
-  if (gameOtherData.firstPlayerLastMoveCommand != null){
-    if (gameOtherData.firstPlayerLastMoveCommand + nullMovementAfter < new Date().getTime()) {
-      gamePhysicsData.firstPlayerMove = "none";
-    }
-  }
-  if (gameOtherData.secondPlayerLastMoveCommand != null){
-    if (gameOtherData.secondPlayerLastMoveCommand + nullMovementAfter < new Date().getTime()) {
-      gamePhysicsData.secondPlayerMove = "none";
-    }
-  }
-
 
 
   physics(gamePhysicsData,

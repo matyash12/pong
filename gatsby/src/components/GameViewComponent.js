@@ -25,6 +25,7 @@ function GameViewComponent() {
     const [amILeftPlayer, setAmILeftPlayer] = React.useState(null);
     const [haveOpponent, setHaveOpponent] = React.useState(false);
 
+
     function joinOnClick() {
         if (socket) {
             console.log("Join")
@@ -36,78 +37,103 @@ function GameViewComponent() {
 
     React.useEffect(() => {
         const newSocket = io('http://localhost/');
+
         setSocket(newSocket);
 
+        var movement = "none";
+        function newMovement(move) {
 
-        function keyHandler(e) {  // simple but powerful
-            switch (e.key) {
-                case "ArrowDown":
-                    console.debug("ArrowDown");
-                    newSocket.emit("playerPos", "down")
-                    break;
-                case "ArrowUp":
-                    console.debug("ArrowUp");
-                    newSocket.emit("playerPos", "up")
-                    break;
-                default:
-                    return;
+            if (movement != move) {
+                movement = move;
+                newSocket.emit("playerPos", move)
             }
         }
 
-        document.addEventListener("keydown", keyHandler);
-       
-
-
-            newSocket.on("data", function (data) {
-                setPhysics(data.gamePhysicsData)
-
-                setFirstPlayerPos(data.gamePhysicsData.firstPlayerPos)
-                setSecondPlayerPos(data.gamePhysicsData.secondPlayerPos)
-                setBallLeftPos(data.gamePhysicsData.ballLeftPos)
-                setBallTopPos(data.gamePhysicsData.ballTopPos)
-
-                setStartIn(data.gameOtherData.startIn)
-                setFirstPlayerScore(data.gameOtherData.firstPlayerScore)
-                setSecondPlayerScore(data.gameOtherData.secondPlayerScore)
-                //setHaveOpponent(true);
-
-                setHaveOpponent(data.gameOtherData.firstPlayerName != null && data.gameOtherData.secondPlayerName != null)
-            })
-
-            newSocket.on("join", function (join) {
-                if (join != "full") {
-                    setGameRunning(true);
-                    setAmILeftPlayer(join == "first")
-                } else {
-                    console.log("Game full!")
-                    alert("Game full :(")
+        document.addEventListener("keydown", function (e) {  // simple but powerful
+        switch (e.key) {
+            case "ArrowDown":
+                console.debug("ArrowDown");
+                newMovement("down");
+                break;
+            case "ArrowUp":
+                console.debug("ArrowUp");
+                newMovement("up");
+                break;
+            default:
+                return;
+        }
+    });
+    document.addEventListener("keyup", function (e) {
+        switch (e.key) {
+            case "ArrowDown":
+                console.debug("ArrowDown-keyup");
+                if (movement == "down") {
+                    newMovement("none")
                 }
-            });
-
-
-
-            return () => {
-                if (socket) {
-                    socket.disconnect();
+                break;
+            case "ArrowUp":
+                console.debug("ArrowUp-keyup");
+                if (movement == "up") {
+                    newMovement("none")
                 }
-            };
+                break;
+            default:
+                return;
+        }
+    });
 
 
-        }, []);
 
-    return (
-        <div>
-            <div style={{ display: "flex" }}>
-                {gameRunning == false ? (
-                    <ButtonComponent text="Join" onClick={joinOnClick}></ButtonComponent>
-                ) : (
-                    <div>
-                        <PlayFieldComponent startIn={startIn} leftPlayerPos={firstPlayerPos} rightPlayerPos={secondPlayerPos} ballLeftPos={ballLeftPos} ballTopPos={ballTopPos} leftScore={firstPlayerScore} rightScore={secondPlayerScore} haveOpponent={haveOpponent}></PlayFieldComponent>
-                        
-                    </div>
-                )}
-            </div>
+
+    newSocket.on("data", function (data) {
+        setPhysics(data.gamePhysicsData)
+
+        setFirstPlayerPos(data.gamePhysicsData.firstPlayerPos)
+        setSecondPlayerPos(data.gamePhysicsData.secondPlayerPos)
+        setBallLeftPos(data.gamePhysicsData.ballLeftPos)
+        setBallTopPos(data.gamePhysicsData.ballTopPos)
+
+        setStartIn(data.gameOtherData.startIn)
+        setFirstPlayerScore(data.gameOtherData.firstPlayerScore)
+        setSecondPlayerScore(data.gameOtherData.secondPlayerScore)
+
+        setHaveOpponent(data.gameOtherData.firstPlayerName != null && data.gameOtherData.secondPlayerName != null)
+    })
+
+    newSocket.on("join", function (join) {
+        if (join != "full") {
+            setGameRunning(true);
+            setAmILeftPlayer(join == "first")
+        } else {
+            console.log("Game full!")
+            alert("Game full :(")
+        }
+    });
+
+
+
+    return () => {
+        if (socket) {
+            socket.disconnect();
+        }
+    };
+
+
+}, []);
+
+return (
+    <div>
+        <div style={{ display: "flex" }}>
+            {gameRunning == false ? (
+                <ButtonComponent text="Join" onClick={joinOnClick}></ButtonComponent>
+            ) : (
+                <div>
+                    <PlayFieldComponent startIn={startIn} leftPlayerPos={firstPlayerPos} rightPlayerPos={secondPlayerPos} ballLeftPos={ballLeftPos} ballTopPos={ballTopPos} leftScore={firstPlayerScore} rightScore={secondPlayerScore} haveOpponent={haveOpponent}></PlayFieldComponent>
+
+                </div>
+            )}
         </div>
-    )
+    </div>
+)
 }
 export default GameViewComponent;
