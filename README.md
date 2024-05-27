@@ -1,6 +1,7 @@
 # Pong
+Live 2 player ping-pong 
 
-Play Pong online at [ping.pong.hajek.live](http://ping.pong.hajek.live)
+You can try it out at: [ping.pong.hajek.live](http://ping.pong.hajek.live)
 
 ## Technologies Used
 - **React**: A JavaScript library for building user interfaces
