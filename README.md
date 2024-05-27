@@ -2,6 +2,10 @@
 Live 2 player ping-pong 
 
 You can try it out at: [ping.pong.hajek.live](http://ping.pong.hajek.live)
+<img width="1005" alt="Screenshot 2024-05-27 at 22 00 06" src="https://github.com/matyash12/pong/assets/93146910/85577b73-acc2-4387-ae25-125283de973c">
+
+
+
 
 ## Technologies Used
 - **React**: A JavaScript library for building user interfaces
@@ -25,3 +29,4 @@ You can try it out at: [ping.pong.hajek.live](http://ping.pong.hajek.live)
 4. **Start the Express Server**
    - Navigate to the `express` folder.
    - Run `node server.js` to start the Express server.
+
